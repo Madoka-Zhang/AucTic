@@ -26,7 +26,7 @@ function MyTics() {
             const listItems = results.map((result) => {
                 if (result.owner === myaccount) {
                     return (
-                        <Col span={6}>
+                        <Col span={5} offset={1}>
                             <MTics name={result.name} category={result.category} image={result.image} id={result.id}></MTics>
                         </Col>
                     )

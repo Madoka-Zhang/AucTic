@@ -4,6 +4,7 @@ import { Layout, Menu, Breadcrumb } from 'antd';
 import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons';
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import BidCenter from './BidCenter';
+import BidSuccess from './BidSuccess';
 import '../App.css'
 
 const { Content, Sider } = Layout;
@@ -35,18 +36,12 @@ function CenterPage() {
                     拍卖成功
                     </Link>
                 </Menu.Item>
-                <Menu.Item key="3">
-                    <Link to="havebid">
-                    参与竞拍
-                    </Link>    
-                </Menu.Item>
             </Menu>
             </Sider>
             <Layout style={{ padding: '0px 0px 0px 200px' }}>
                 <Switch>
                     <Route path="/center" component={BidCenter}></Route>
-                    <Route path="/success" component={BidCenter}></Route>
-                    <Route path="/havebid" component={BidCenter}></Route>
+                    <Route path="/success" component={BidSuccess}></Route>
                 </Switch>
             </Layout>
         </Layout>

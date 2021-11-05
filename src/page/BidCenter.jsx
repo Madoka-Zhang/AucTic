@@ -94,6 +94,7 @@ function BidCenter() {
                         highestBidder: result.highestBidder,
                         secondBid: web3.utils.fromWei(result.secondBid),
                         bid: [result.totalBids],
+                        st: result.status,
                     }
                 )
             })
@@ -261,11 +262,12 @@ function BidCenter() {
                     title="Action"
                     key="action"
                     render={(text, record) => {
-                            let s = (record.state==2&&myaccount==record.highestBidder)?false:true;
+                            let c = (record.state==1)?false:true;
+                            let s = (record.state==2&&myaccount==record.highestBidder&&record.st<2)?false:true;
                             let p = (pending==0?true:false);
                             console.log("dddddbuttonvisible: ", s, record.state, myaccount, record.highestBidder);
                             return (<div>
-                                    <Button onClick={()=>onClickbtn(record.Aucid, record.highestBid, record.t1, record.t2)} type="primary">出价 {record.Aucid}</Button>
+                                    <Button onClick={()=>onClickbtn(record.Aucid, record.highestBid, record.t1, record.t2)} type="primary" disabled={c}>出价 {record.Aucid}</Button>
                                     <Button onClick={()=>onClickget(record.Aucid, record.highestBidder, record.state, record.item)} disabled={s}>领取 {record.Aucid}</Button>
                                     <Button onClick={()=>onClickped()} disabled={p}>返钱 {record.Aucid}</Button>
                                     </div>

@@ -4,7 +4,7 @@ pragma solidity ^0.8.8;
 contract Auction {
     enum Status { Open, Sold, Unsold }
     enum Conditions { New, Used }
-    enum AucStatus { unstart, biding, end }
+    enum AucStatus { unstart, biding, end, allend }
 
     uint public numTic = 0;
     Tic[] public Tics;
@@ -139,8 +139,8 @@ contract Auction {
         // require(block.timestamp >= auction.timeEnd, "No ending");
         // require(tic.statu == Status.Sold, "unsolding");
 
-        Auctions[num].status = AucStatus.end;
-        if (Auctions[num].highestBidder == msg.sender) {
+        Auctions[num].status = AucStatus.allend;
+        if (Auctions[num].highestBidder == address(0)) {
             Tics[tic].statu = Status.Unsold;
         }
         else {

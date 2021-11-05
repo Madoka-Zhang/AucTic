@@ -1,42 +1,55 @@
 import React, {useState} from 'react';
 import ReactDOM from "react-dom";
-import { Layout, Breadcrumb, Col, Row, Table, Tag, Space, Button} from 'antd';
+import { Drawer, Form, Input, Layout, Breadcrumb, Col, Row, Table, Tag, Button, notification} from 'antd';
 
 import '../App.css'
-import MTics from './MTics';
 import web3 from '../utils/Initweb3';
 import getAllAuc from '../interact/getAllAuc';
-import endAuction from '../interact/endAuction';
+import bidOnce from '../interact/bidOnce';
+import claim from '../interact/claim';
+import withDraw from '../interact/withDraw';
+import getpending from '../interact/getpending';
 
 const { Content } = Layout;
-const { Column, ColumnGroup } = Table;
+const { Column } = Table;
 
-function MyAuc() {
+function BidSuccess() {
     const [DrawResult, setDrawResult] = useState('');
     const [myaccount, setmyaccount] = useState('');
     const [visible, setvisible] = useState(false);
+    const [price, setprice] = useState(0);
     const [Aucid, setAucid] = useState(0);
+    const [pe, setpe] = useState(0);
+    const [st, setst] = useState(0);
+    const [ed, seted] = useState(0);
+    const [pending, setpending] = useState(0);
+
     const a = () => {
         web3.eth.getAccounts().then(function(results) {
             setmyaccount(results[0]);
         })
     }
+
+    const gtpending = () => {
+        getpending().then(function(pend) {
+            setpending(pend);
+        })
+    }
+
     if (myaccount === '') {
         a();
+        gtpending();
     }
     console.log("input myacount: ", myaccount);
     const s = () => {
         getAllAuc().then(function(results) {
-            const listItems = results.filter((result) => {
-                var date = new Date(parseInt(result.timeEnd));
-                console.log("date: ", date);
-                console.log("category", result.totalBids)
-                console.log("myaccount:", myaccount, "resultowner", result.creater);
-                if (result.creater === myaccount) {
+            const listItems = (results.filter((result) => {
+                console.log("time Ed: ", result.timeEnd);
+                if (result.creater !== myaccount && result.highestBidder === myaccount && result.status == 2) {
                     return true;
                 }
                 return false;
-            }).map((result) => {
+            })).map((result) => {
                 var stdate = new Date(parseInt(result.timeBegin*1000));
                 var eddate = new Date(parseInt(result.timeEnd*1000));
                 var now = new Date();
@@ -54,30 +67,47 @@ function MyAuc() {
                         state: sd,
                         highestBid: web3.utils.fromWei(result.highestBid),
                         highestBidder: result.highestBidder,
+                        secondBid: web3.utils.fromWei(result.secondBid),
                         bid: [result.totalBids],
-                        st: result.status,
                     }
                 )
             })
             setDrawResult(listItems);
-            console.log("result:", listItems);
+            console.log("list result:", listItems);
             // ReactDOM.render(tictic, document.getElementById('root'));
             
         });
     }
 
-    const onClickbtn = (Aucid, tic) => {
-        console.log("Aucid: ", Aucid, tic);
-        // setAucid(id);
-        // setvisible(true);
-        endAuction(Aucid, tic).then(function() {
-            console.log("end endAuction!");
-        })
+    const onClose = () => {
+        setvisible(false);
+        console.log(visible);
+    }
+    
+    const onChange = (value) => {
+        setprice(value.target.value);
+    }
+
+    const onClickbtn = (id, price, stz, ebd) => {
+        console.log("Aucid: ", id);
+        setAucid(id);
+        setvisible(true);
+        setpe(price);
+        setst(stz);
+        seted(ebd);
+        console.log("pdddset : ", id, price, stz, ebd);
         return false;
     }
 
-    const onClickget = () => {
+    const onClickget = (index, winner, state, tic) => {
+        claim(index, tic);
+        console.log("onclickget", index, tic);
+    }
 
+    const onClickped = () => {
+        withDraw().then(function() {
+            console.log("withDraw end");
+        })
     }
 
     const [x, setx] = useState(true);
@@ -85,11 +115,50 @@ function MyAuc() {
         setx(false);
         s()
     }
+
+    const [title, settitle] = useState('');
+    const [descrip, setdescrip] = useState('');
+
+    const openNotification = type => {
+        notification[type]({
+            message: `"234" ${title}`,
+            description: `234 ${descrip}`,
+        });
+    };
+
+    const dobidOnce = (Aucid, price) => {
+        let now = new Date();
+        setvisible(false);
+        let n = parseInt(now.valueOf()/1000);
+        if (n<st) {
+            settitle('Error');
+            setdescrip('unstart');
+            openNotification('error');
+        }
+        else if (n>ed) {
+            settitle('Error');
+            setdescrip('ended');
+            openNotification('error');
+        }
+        else if (price < pe) {
+            settitle('Error');
+            setdescrip('no money');
+            openNotification('error');
+        }
+        else {
+            bidOnce(Aucid, price, n).then(function() {
+                settitle('Success');
+                setdescrip("ohhhhhhh!");
+                openNotification('success');
+            })
+        }
+    }
+
     return (
         <Layout style={{ padding: '0 24px 24px' }}>
             <Breadcrumb style={{ margin: '16px 0' }}>
-                <Breadcrumb.Item>My</Breadcrumb.Item>
-                <Breadcrumb.Item>MyAuc</Breadcrumb.Item>
+                <Breadcrumb.Item>Auction</Breadcrumb.Item>
+                <Breadcrumb.Item>AucCenter</Breadcrumb.Item>
             </Breadcrumb>
             <Content
                 className="site-layout-background"
@@ -104,7 +173,7 @@ function MyAuc() {
                     expandedRowRender: record => <p style={{ margin: 0 }}>发起者：{record.creater}</p>,
                     rowExpandable: record => record.name !== 'Not Expandable',
                   }}>
-                <Column title="序号" dataIndex="Aucid" key="Aucid" sorter={(a, b)=>a.Aucid-b.Aucid}/>
+                    <Column title="序号" dataIndex="Aucid" key="Aucid" sorter={(a, b)=>a.Aucid-b.Aucid}/>
                     {/* <Column title="发起者" dataIndex="creater" key="creater" sorter={(a, b)=>a.creater-b.creater}/> */}
                     <Column title="Tic" dataIndex="item" key="item" sorter={(a,b)=>a.item-b.item} />
                     <Column title="开始时间" dataIndex="timeStart" key="timeStart" sorter={(a, b)=>a.timeStart-b.timeStart}/>
@@ -116,6 +185,7 @@ function MyAuc() {
                     title="竞拍次数"
                     dataIndex="bid"
                     key="bid"
+                    sorter={(a, b)=>a.bid-b.bid}
                     render={tags => (
                         <p>
                         
@@ -126,6 +196,8 @@ function MyAuc() {
                     )}
                     />
                     <Column title="状态" dateIndex="state" key="state"
+                    filters={[{text:'未开始',value:0},{text:'进行中',value:1},{text:'已结束',value:2}]}
+                    onFilter={(value, record)=>record.state === value}
                     render={status => {
                         let st = status.state;
                         console.log("render.status", st);
@@ -135,31 +207,45 @@ function MyAuc() {
                         console.log("render color tag", color, tag);
                         return <Tag color={color}>{tag}</Tag>
                     }}/>
-                    <Column
-                    title="Action"
-                    key="action"
-                    render={(text, record) => {
-                        let s = (record.st==2&&0!=record.highestBidder)?false:true;
-                        let t = (record.st==2&&0==record.highestBidder)?false:true;
-                        console.log("statusal: ", record.Aucid, record.time);
-                            return (<div>
-                                    <Button onClick={()=>onClickbtn(record.Aucid, record.item)} type="primary" disabled={s}>收钱 {record.Aucid}</Button>
-                                    <Button onClick={()=>onClickbtn(record.Aucid, record.item)} disabled={t}>流拍 {record.Aucid}</Button>
-                                    </div>
-                                )
-                        }
-                    }
-                    />
                 </Table>
-                
+                <Drawer
+                title="拍卖"
+                width={360}
+                onClose={onClose}
+                visible={visible}
+                bodyStyle={{ paddingBottom: 80 }}
+                >
+                <Form layout="vertical" hideRequiredMark>
+                    <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item
+                        name="出价"
+                        label="price"
+                        rules={[{ required: true, message: 'Please enter your price' }]}
+                        >
+                        <Input placeholder="Please enter your price" onChange={onChange}/>
+                        </Form.Item>
+                    </Col>
+                    </Row>
+                    
+                    <Row gutter={16}>
+                    <Col span={12}>
+                        <Button onClick={onClose}>取消</Button>
+                    </Col>
+                    <Col span={12}>
+                        <Button type="primary" onClick={()=>dobidOnce(Aucid, price)}>确认</Button>
+                    </Col>
+                    </Row>
+                </Form>
+                </Drawer>
             </Content>
         </Layout>
     )
 }
 
-export default MyAuc;
+export default BidSuccess;
 
 ReactDOM.render(
-    <MyAuc />,
+    <BidSuccess />,
     document.getElementById('root')
     )
