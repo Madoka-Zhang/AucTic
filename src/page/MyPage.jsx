@@ -39,7 +39,7 @@ function MyPage() {
                     </Menu.Item>
                 </Menu>
                 </Sider>
-                <Layout style={{ padding: '0 200px 0px' }}>
+                <Layout style={{ padding: '0px 24px 24px 200px' }}>
                     <Switch>
                         <Route path="/my" component={MyTics}></Route>
                         <Route path="/myauc" component={MyAuc}></Route>

@@ -41,7 +41,7 @@ function AllTic() {
     const s = () => {
         getAllTic().then(function(results) {
             const listItems = results.map((result) =>
-                <Col xs={{ span: 4, offset: 1 }} lg={{ span: 6, offset: 0 }}>
+                <Col span={5} offset={1} align="center">
                     <Tics name={result.name} category={result.category} image={result.image} id={result.id}></Tics>
                 </Col>
             );
@@ -67,7 +67,7 @@ function AllTic() {
                 minHeight: 280,
                 }}
             >
-                <Row justify="space-around" gutter={[16, 24]} align="middle">
+                <Row gutter={[16, 24]} align="middle">
                     {DrawResult}
                 </Row>
             </Content>

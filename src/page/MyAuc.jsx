@@ -99,7 +99,7 @@ function MyAuc() {
                 }}
             >
                 <Table dataSource={DrawResult}>
-                <Column title="序号" dataIndex="Aucid" key="Aucid" />
+                    <Column title="序号" dataIndex="Aucid" key="Aucid" />
                     <Column title="发起者" dataIndex="creater" key="creater" />
                     <Column title="Tic" dataIndex="item" key="item" />
                     <Column title="开始时间" dataIndex="timeStart" key="timeStart" />
@@ -132,8 +132,9 @@ function MyAuc() {
                     title="Action"
                     key="action"
                     render={(text, record) => {
-                        let s = (record.state==2&&myaccount==record.highestBidder)?true:false;
+                        let s = (record.state==2&&myaccount==record.highestBidder)?false:true;
                         let t = (record.state==2&&myaccount!=record.highestBidder)?false:true;
+                        console.log("statusal: ", record.state, s);
                             return (<div>
                                     <Button onClick={()=>onClickbtn(record.Aucid, record.item)} type="primary" disabled={s}>收钱 {record.Aucid}</Button>
                                     <Button onClick={()=>onClickget()} disabled={s}>流拍 {record.Aucid}</Button>

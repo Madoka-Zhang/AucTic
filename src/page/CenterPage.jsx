@@ -42,7 +42,7 @@ function CenterPage() {
                 </Menu.Item>
             </Menu>
             </Sider>
-            <Layout style={{ padding: '0 200px 24px' }}>
+            <Layout style={{ padding: '0px 0px 0px 200px' }}>
                 <Switch>
                     <Route path="/center" component={BidCenter}></Route>
                     <Route path="/success" component={BidCenter}></Route>

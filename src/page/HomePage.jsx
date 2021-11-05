@@ -54,7 +54,7 @@ function HomePage() {
                     </SubMenu>
                 </Menu>
                 </Sider>
-                <Layout style={{ padding: '0px 200px 0px'}}>
+                <Layout style={{ padding: '0px 24px 24px 200px'}}>
                     <Switch>
                         <Route path="/new" component={NewTic}></Route>
                         <Route path="/load" ></Route>

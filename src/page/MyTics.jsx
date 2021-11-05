@@ -26,7 +26,7 @@ function MyTics() {
             const listItems = results.map((result) => {
                 if (result.owner === myaccount) {
                     return (
-                        <Col xs={{ span: 4, offset: 1 }} lg={{ span: 6, offset: 0 }}>
+                        <Col span={6}>
                             <MTics name={result.name} category={result.category} image={result.image} id={result.id}></MTics>
                         </Col>
                     )
@@ -56,7 +56,7 @@ function MyTics() {
                 minHeight: 280,
                 }}
             >
-                <Row justify="space-around" gutter={[16, 24]} align="middle">
+                <Row gutter={[16, 24]} align="middle">
                     {DrawResult}
                 </Row>
                 

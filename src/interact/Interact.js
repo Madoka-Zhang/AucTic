@@ -2,7 +2,7 @@
 import web3 from '../utils/Initweb3'
 import AuctionContract from '../eth/AuctionContract'
 
-let castTic= (name,image,category) => async()=> {
+async function castTic(name,image,category) {
     console.log(web3);
     let account=await web3.eth.getAccounts();
     console.log("castTic", account[0], name, image, category);

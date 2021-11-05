@@ -1,37 +1,74 @@
 import React, {useState} from 'react';
 import ReactDOM from "react-dom";
-import { Drawer, Form, Input, Layout, Breadcrumb, Col, Row, Table, Tag, Space, Button, notification} from 'antd';
+import { Drawer, Form, Input, Layout, Breadcrumb, Col, Row, Table, Tag, Button, notification, Modal} from 'antd';
 
 import '../App.css'
-import MTics from './MTics';
 import web3 from '../utils/Initweb3';
 import getAllAuc from '../interact/getAllAuc';
 import bidOnce from '../interact/bidOnce';
 import claim from '../interact/claim';
 import withDraw from '../interact/withDraw';
+import getpending from '../interact/getpending';
+import getHistory from "../interact/getHistory";
 
 const { Content } = Layout;
-const { Column, ColumnGroup } = Table;
+const { Column } = Table;
 
 function BidCenter() {
+    const [history, sethistory] = useState('');
     const [DrawResult, setDrawResult] = useState('');
     const [myaccount, setmyaccount] = useState('');
     const [visible, setvisible] = useState(false);
     const [price, setprice] = useState(0);
     const [Aucid, setAucid] = useState(0);
+    const [pe, setpe] = useState(0);
+    const [st, setst] = useState(0);
+    const [ed, seted] = useState(0);
+    const [pending, setpending] = useState(0);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const showModal = (id) => {
+        setIsModalVisible(true);
+        getHistory(id).then(function(results) {
+            var i = 0;
+            const listItems = results.map(function(res) {
+                i = i + 1;
+                return (
+                    {
+                        hid :i,
+                        haddress: res,
+                    }
+                )
+            })
+            console.log("sethistory", listItems);
+            sethistory(listItems);
+        })
+    };
+
+    const handleOk = () => {
+        setIsModalVisible(false);
+    };
+
     const a = () => {
         web3.eth.getAccounts().then(function(results) {
             setmyaccount(results[0]);
         })
     }
+
+    const gtpending = () => {
+        getpending().then(function(pend) {
+            setpending(pend);
+        })
+    }
+
     if (myaccount === '') {
         a();
+        gtpending();
     }
     console.log("input myacount: ", myaccount);
     const s = () => {
         getAllAuc().then(function(results) {
             const listItems = (results.filter((result) => {
-                var date = new Date(parseInt(result.timeEnd));
                 console.log("time Ed: ", result.timeEnd);
                 if (result.creater !== myaccount) {
                     return true;
@@ -55,6 +92,7 @@ function BidCenter() {
                         state: sd,
                         highestBid: web3.utils.fromWei(result.highestBid),
                         highestBidder: result.highestBidder,
+                        secondBid: web3.utils.fromWei(result.secondBid),
                         bid: [result.totalBids],
                     }
                 )
@@ -74,10 +112,6 @@ function BidCenter() {
     const onChange = (value) => {
         setprice(value.target.value);
     }
-
-    const [pe, setpe] = useState(0);
-    const [st, setst] = useState(0);
-    const [ed, seted] = useState(0);
 
     const onClickbtn = (id, price, stz, ebd) => {
         console.log("Aucid: ", id);
@@ -145,11 +179,30 @@ function BidCenter() {
         }
     }
 
+    const columns = [
+        {
+        title: '编号',
+        dataIndex: 'hid',
+        key: 'hid',
+        },
+        {
+        title: '地址',
+        dataIndex: 'haddress',
+        key: 'haddress',
+        },
+    ];
+
+    const gettablehis = () => {
+        return (
+            <Table dataSource={history} columns={columns} />
+        )
+    }
+
     return (
         <Layout style={{ padding: '0 24px 24px' }}>
             <Breadcrumb style={{ margin: '16px 0' }}>
-                <Breadcrumb.Item>My</Breadcrumb.Item>
-                <Breadcrumb.Item>MyAuc</Breadcrumb.Item>
+                <Breadcrumb.Item>Auction</Breadcrumb.Item>
+                <Breadcrumb.Item>AucCenter</Breadcrumb.Item>
             </Breadcrumb>
             <Content
                 className="site-layout-background"
@@ -159,17 +212,30 @@ function BidCenter() {
                 minHeight: 280,
                 }}
             >
-                <Table dataSource={DrawResult}>
-                    <Column title="序号" dataIndex="Aucid" key="Aucid" />
-                    <Column title="发起者" dataIndex="creater" key="creater" />
-                    <Column title="Tic" dataIndex="item" key="item" />
-                    <Column title="开始时间" dataIndex="timeStart" key="timeStart" />
-                    <Column title="结束时间" dataIndex="timeEnd" key="timeEnd" />
-                    <Column title="价格" dataIndex="highestBid" key="highestBid" />
+                <Layout>
+                    <Tag color="green">可反金额：{pending}</Tag>
+                </Layout>
+                <Table dataSource={DrawResult} rowKey='creater' expandedRowRender={(record) => this.expandedRowRender(record)}
+                  expandable={{
+                    expandedRowRender: record => <p style={{ margin: 0 }}>发起者：{record.creater}</p>,
+                    rowExpandable: record => record.name !== 'Not Expandable',
+                  }}>
+                    <Column title="序号" dataIndex="Aucid" key="Aucid" sorter={(a, b)=>a.Aucid-b.Aucid}/>
+                    {/* <Column title="发起者" dataIndex="creater" key="creater" sorter={(a, b)=>a.creater-b.creater}/> */}
+                    <Column title="Tic" dataIndex="item" key="item" sorter={(a,b)=>a.item-b.item}
+                        render={id => (
+                            <a href="#" onClick={() => showModal(id)}>{id}</a>
+                        )}/>
+                    <Column title="开始时间" dataIndex="timeStart" key="timeStart" sorter={(a, b)=>a.timeStart-b.timeStart}/>
+                    <Column title="结束时间" dataIndex="timeEnd" key="timeEnd" sorter={(a, b)=>a.timeEnd-b.timeEnd}/>
+                    <Column title="价格" dataIndex="highestBid" key="highestBid" sorter={(a, b)=>a.highestBid-b.highestBid}/>
+                    <Column title="次价" dataIndex="secondBid" key="secondBid" sorter={(a, b)=>a.secondBid-b.secondBid}/>
+                    <Column title="最高出价者" dataIndex="highestBidder" key="highestBidder" sorter={(a, b)=>a.highestBidder-b.highestBidder}/>
                     <Column
                     title="竞拍次数"
                     dataIndex="bid"
                     key="bid"
+                    sorter={(a, b)=>a.bid-b.bid}
                     render={tags => (
                         <p>
                         
@@ -180,6 +246,8 @@ function BidCenter() {
                     )}
                     />
                     <Column title="状态" dateIndex="state" key="state"
+                    filters={[{text:'未开始',value:0},{text:'进行中',value:1},{text:'已结束',value:2}]}
+                    onFilter={(value, record)=>record.state === value}
                     render={status => {
                         let st = status.state;
                         console.log("render.status", st);
@@ -194,11 +262,12 @@ function BidCenter() {
                     key="action"
                     render={(text, record) => {
                             let s = (record.state==2&&myaccount==record.highestBidder)?false:true;
+                            let p = (pending==0?true:false);
                             console.log("dddddbuttonvisible: ", s, record.state, myaccount, record.highestBidder);
                             return (<div>
                                     <Button onClick={()=>onClickbtn(record.Aucid, record.highestBid, record.t1, record.t2)} type="primary">出价 {record.Aucid}</Button>
                                     <Button onClick={()=>onClickget(record.Aucid, record.highestBidder, record.state, record.item)} disabled={s}>领取 {record.Aucid}</Button>
-                                    <Button onClick={()=>onClickped()}>返钱 {record.Aucid}</Button>
+                                    <Button onClick={()=>onClickped()} disabled={p}>返钱 {record.Aucid}</Button>
                                     </div>
                                 )
                         }
@@ -236,6 +305,9 @@ function BidCenter() {
                 </Form>
                 </Drawer>
             </Content>
+            <Modal title="历史流转" visible={isModalVisible} onOk={handleOk}>
+                {gettablehis()}
+            </Modal>
         </Layout>
     )
 }

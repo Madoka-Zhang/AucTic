@@ -41,11 +41,11 @@ function NewAuc(props){
 	return (
 	<>
 		<Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
-		New account
+		新建拍卖
 		</Button>
 		<Drawer
 		title="Create a new account"
-		width={720}
+		width={400}
 		onClose={onClose}
 		closable={false}
 		visible={state}
@@ -61,7 +61,7 @@ function NewAuc(props){
 		>
 		<Form layout="vertical" hideRequiredMark>
 			<Row gutter={16}>
-			<Col span={12}>
+			<Col span={24}>
 				<Form.Item
 				name="price"
 				label="StartPrice"
@@ -75,7 +75,7 @@ function NewAuc(props){
 				</Space>
 				</Form.Item>
 			</Col>
-			<Col span={12}>
+			<Col span={24}>
 				<Form.Item
 				name="dateTime"
 				label="DateTime"
