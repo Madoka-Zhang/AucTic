@@ -5,7 +5,14 @@ Tic拍卖平台（Tic是我瞎编的名字
 
 在src中使用truffle部署，文件同样在src中
 然后把地址复制到src/eth/AuctionContract.js中
-在根目录运行yarn start即可
+在根目录运行yarn start即可，由于使用了其他组件以及为了传送文件方便，没有附带modules，其他地方运行可能需要安装对应的库
+
+```
+yarn add antd
+yarn add react-router-dom
+```
+
+
 
 ## 使用流程
 

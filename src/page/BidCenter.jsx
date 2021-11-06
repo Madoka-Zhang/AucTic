@@ -213,7 +213,7 @@ function BidCenter() {
                 <Layout>
                     <Tag color="green">可反金额：{pending}</Tag>
                 </Layout>
-                <Table dataSource={DrawResult} rowKey='creater' expandedRowRender={(record) => this.expandedRowRender(record)}
+                <Table dataSource={DrawResult} rowKey='Aucid' expandedRowRender={(record) => this.expandedRowRender(record)}
                   expandable={{
                     expandedRowRender: record => <p style={{ margin: 0 }}>发起者：{record.creater}</p>,
                     rowExpandable: record => record.name !== 'Not Expandable',

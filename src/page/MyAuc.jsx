@@ -45,7 +45,7 @@ function MyAuc() {
                 return (
                     {
                         Aucid: result.Aucid,
-                        creater: result.creater,
+                        create: result.creater,
                         item: result.item,
                         itemname: result.itemname,
                         timeStart: stdate.toLocaleString(),
@@ -102,11 +102,7 @@ function MyAuc() {
                 minHeight: 280,
                 }}
             >
-                <Table dataSource={DrawResult} rowKey='creater' expandedRowRender={(record) => this.expandedRowRender(record)}
-                  expandable={{
-                    expandedRowRender: record => <p style={{ margin: 0 }}>发起者：{record.creater}</p>,
-                    rowExpandable: record => record.name !== 'Not Expandable',
-                  }}>
+                <Table dataSource={DrawResult}>
                 <Column title="序号" dataIndex="Aucid" key="Aucid" sorter={(a, b)=>a.Aucid-b.Aucid}/>
                     {/* <Column title="发起者" dataIndex="creater" key="creater" sorter={(a, b)=>a.creater-b.creater}/> */}
                     <Column title="Tic" dataIndex="itemname" key="itemname" sorter={(a,b)=>a.item-b.item} />
