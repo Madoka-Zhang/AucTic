@@ -47,6 +47,7 @@ function MyAuc() {
                         Aucid: result.Aucid,
                         creater: result.creater,
                         item: result.item,
+                        itemname: result.itemname,
                         timeStart: stdate.toLocaleString(),
                         timeEnd: eddate.toLocaleString(),
                         t1: result.timeBegin,
@@ -54,6 +55,7 @@ function MyAuc() {
                         state: sd,
                         highestBid: web3.utils.fromWei(result.highestBid),
                         highestBidder: result.highestBidder,
+                        secondBid: web3.utils.fromWei(result.secondBid),
                         bid: [result.totalBids],
                         st: result.status,
                     }
@@ -72,6 +74,7 @@ function MyAuc() {
         // setvisible(true);
         endAuction(Aucid, tic).then(function() {
             console.log("end endAuction!");
+            window.location.assign("http://localhost:3000/");
         })
         return false;
     }
@@ -106,7 +109,7 @@ function MyAuc() {
                   }}>
                 <Column title="序号" dataIndex="Aucid" key="Aucid" sorter={(a, b)=>a.Aucid-b.Aucid}/>
                     {/* <Column title="发起者" dataIndex="creater" key="creater" sorter={(a, b)=>a.creater-b.creater}/> */}
-                    <Column title="Tic" dataIndex="item" key="item" sorter={(a,b)=>a.item-b.item} />
+                    <Column title="Tic" dataIndex="itemname" key="itemname" sorter={(a,b)=>a.item-b.item} />
                     <Column title="开始时间" dataIndex="timeStart" key="timeStart" sorter={(a, b)=>a.timeStart-b.timeStart}/>
                     <Column title="结束时间" dataIndex="timeEnd" key="timeEnd" sorter={(a, b)=>a.timeEnd-b.timeEnd}/>
                     <Column title="价格" dataIndex="highestBid" key="highestBid" sorter={(a, b)=>a.highestBid-b.highestBid}/>
@@ -140,7 +143,7 @@ function MyAuc() {
                     key="action"
                     render={(text, record) => {
                         let s = (record.st==2&&0!=record.highestBidder)?false:true;
-                        let t = (record.st==2&&0==record.highestBidder)?false:true;
+                        let t = (record.st!=3&&record.state==2&&0==record.highestBidder)?false:true;
                         console.log("statusal: ", record.Aucid, record.time);
                             return (<div>
                                     <Button onClick={()=>onClickbtn(record.Aucid, record.item)} type="primary" disabled={s}>收钱 {record.Aucid}</Button>

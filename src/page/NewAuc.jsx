@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Drawer, Form, Button, Col, Row, Input, Select, DatePicker, Space, InputNumber } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import newAuct from '../interact/newAuc'
+import moment from 'moment';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -38,13 +39,20 @@ function NewAuc(props){
 		console.log('onOk: ', value);
 	}
 
+	const onNewAuc = (id, startdate, enddate, startprice) => {
+		if (id !== '' && startdate !== '' && enddate !== '' && startprice !== '')
+		newAuct(id, startdate, enddate, startprice).then(function() {
+			window.location.assign("http://localhost:3000/");
+		})
+	}
+
 	return (
 	<>
 		<Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
 		新建拍卖
 		</Button>
 		<Drawer
-		title="Create a new account"
+		title="Create a new Auction"
 		width={400}
 		onClose={onClose}
 		closable={false}
@@ -52,10 +60,6 @@ function NewAuc(props){
 		bodyStyle={{ paddingBottom: 80 }}
 		extra={
 			<Space>
-			<Button onClick={onClose}>Cancel</Button>
-			<Button onClick={newAuct(props.id, startdate, enddate, startprice)} type="primary">
-				Submit
-			</Button>
 			</Space>
 		}
 		>
@@ -86,6 +90,7 @@ function NewAuc(props){
 					format="YYYY-MM-DD HH:mm:ss"
 					onChange={onChangedata}
 					onOk={onOk}
+					defaultValue={[moment(), moment().add(3, 'minute')]}
 					/>
 				</Form.Item>
 			</Col>
@@ -97,8 +102,7 @@ function NewAuc(props){
 				label="Description"
 				rules={[
 					{
-					required: true,
-					message: 'please enter url description',
+					message: 'please enter auction description',
 					},
 				]}
 				>
@@ -111,7 +115,7 @@ function NewAuc(props){
 					<Button onClick={onClose}>Cancel</Button>
 			</Col>
 			<Col span={12}>
-				<Button onClick={newAuct(id, startdate, enddate, startprice)} type="primary">
+				<Button onClick={() => onNewAuc(id, startdate, enddate, startprice)} type="primary" htmlType="submit">
 					提交
 				</Button>
 			</Col>

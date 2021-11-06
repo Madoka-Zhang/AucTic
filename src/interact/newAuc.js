@@ -1,7 +1,7 @@
 import web3 from '../utils/Initweb3'
 import AuctionContract from '../eth/AuctionContract'
 
-let newAuct= (id, startdate, enddate, startprice) => async()=> {
+async function newAuct(id, startdate, enddate, startprice) {
     console.log(web3);
     let account=await web3.eth.getAccounts();
     let stdate = parseInt(startdate/1000);

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState } from 'react';
 import ReactDOM from "react-dom";
 import { Drawer, Form, Input, Layout, Breadcrumb, Col, Row, Table, Tag, Button, notification, Modal} from 'antd';
 
@@ -85,6 +85,7 @@ function BidCenter() {
                         Aucid: result.Aucid,
                         creater: result.creater,
                         item: result.item,
+                        itemname: result.itemname,
                         timeStart: stdate.toLocaleString(),
                         timeEnd: eddate.toLocaleString(),
                         t1: result.timeBegin,
@@ -126,13 +127,16 @@ function BidCenter() {
     }
 
     const onClickget = (index, winner, state, tic) => {
-        claim(index, tic);
+        claim(index, tic).then(function() {
+            window.location.assign("http://localhost:3000/");
+        });
         console.log("onclickget", index, tic);
     }
 
     const onClickped = () => {
         withDraw().then(function() {
             console.log("withDraw end");
+            window.location.assign("http://localhost:3000/");
         })
     }
 
@@ -142,13 +146,17 @@ function BidCenter() {
         s()
     }
 
-    const [title, settitle] = useState('');
-    const [descrip, setdescrip] = useState('');
-
     const openNotification = type => {
         notification[type]({
-            message: `"234" ${title}`,
-            description: `234 ${descrip}`,
+            message: `Error`,
+            description: `出价不能低于当前最高价格`,
+        });
+    };
+
+    const openNotification1 = type => {
+        notification[type]({
+            message: `Success`,
+            description: `出价成功`,
         });
     };
 
@@ -156,26 +164,15 @@ function BidCenter() {
         let now = new Date();
         setvisible(false);
         let n = parseInt(now.valueOf()/1000);
-        if (n<st) {
-            settitle('Error');
-            setdescrip('unstart');
-            openNotification('error');
-        }
-        else if (n>ed) {
-            settitle('Error');
-            setdescrip('ended');
-            openNotification('error');
-        }
-        else if (price < pe) {
-            settitle('Error');
-            setdescrip('no money');
+        if (price < pe) {
             openNotification('error');
         }
         else {
             bidOnce(Aucid, price, n).then(function() {
-                settitle('Success');
-                setdescrip("ohhhhhhh!");
-                openNotification('success');
+                openNotification1('success');
+                setTimeout(() => {
+                    window.location.assign("http://localhost:3000/");
+                }, 1000);
             })
         }
     }
@@ -223,9 +220,9 @@ function BidCenter() {
                   }}>
                     <Column title="序号" dataIndex="Aucid" key="Aucid" sorter={(a, b)=>a.Aucid-b.Aucid}/>
                     {/* <Column title="发起者" dataIndex="creater" key="creater" sorter={(a, b)=>a.creater-b.creater}/> */}
-                    <Column title="Tic" dataIndex="item" key="item" sorter={(a,b)=>a.item-b.item}
-                        render={id => (
-                            <a href="#" onClick={() => showModal(id)}>{id}</a>
+                    <Column title="Tic" dataIndex="itemname" key="itemname" sorter={(a,b)=>a.item-b.item}
+                        render={(id, record) => (
+                            <a href="#" onClick={() => showModal(record.item)}>{id}</a>
                         )}/>
                     <Column title="开始时间" dataIndex="timeStart" key="timeStart" sorter={(a, b)=>a.timeStart-b.timeStart}/>
                     <Column title="结束时间" dataIndex="timeEnd" key="timeEnd" sorter={(a, b)=>a.timeEnd-b.timeEnd}/>

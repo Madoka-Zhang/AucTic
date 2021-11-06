@@ -49,8 +49,9 @@ function NewTic() {
     const onClickSubmit = (name, url, category) => {
         console.log("testconclicksubmit: ", name, url, category);
         if (name !== '' && url !== '' && category !== '') {
-            castTic(name, url, category);
-            
+            castTic(name, url, category).then(function() {
+                window.location.assign("http://localhost:3000/");
+            });
         }
     }
 

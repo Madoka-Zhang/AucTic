@@ -60,6 +60,7 @@ function BidSuccess() {
                         Aucid: result.Aucid,
                         creater: result.creater,
                         item: result.item,
+                        itemname: result.itemname,
                         timeStart: stdate.toLocaleString(),
                         timeEnd: eddate.toLocaleString(),
                         t1: result.timeBegin,
@@ -158,7 +159,7 @@ function BidSuccess() {
         <Layout style={{ padding: '0 24px 24px' }}>
             <Breadcrumb style={{ margin: '16px 0' }}>
                 <Breadcrumb.Item>Auction</Breadcrumb.Item>
-                <Breadcrumb.Item>AucCenter</Breadcrumb.Item>
+                <Breadcrumb.Item>BidSuccess</Breadcrumb.Item>
             </Breadcrumb>
             <Content
                 className="site-layout-background"
@@ -175,7 +176,7 @@ function BidSuccess() {
                   }}>
                     <Column title="序号" dataIndex="Aucid" key="Aucid" sorter={(a, b)=>a.Aucid-b.Aucid}/>
                     {/* <Column title="发起者" dataIndex="creater" key="creater" sorter={(a, b)=>a.creater-b.creater}/> */}
-                    <Column title="Tic" dataIndex="item" key="item" sorter={(a,b)=>a.item-b.item} />
+                    <Column title="Tic" dataIndex="itemname" key="itemname" sorter={(a,b)=>a.item-b.item} />
                     <Column title="开始时间" dataIndex="timeStart" key="timeStart" sorter={(a, b)=>a.timeStart-b.timeStart}/>
                     <Column title="结束时间" dataIndex="timeEnd" key="timeEnd" sorter={(a, b)=>a.timeEnd-b.timeEnd}/>
                     <Column title="价格" dataIndex="highestBid" key="highestBid" sorter={(a, b)=>a.highestBid-b.highestBid}/>

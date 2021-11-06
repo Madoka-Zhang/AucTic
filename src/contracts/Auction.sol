@@ -36,6 +36,7 @@ contract Auction {
         uint Aucid;
         address creater;
         uint item;
+        string itemname;
         uint timeBegin;
         uint timeEnd;
         uint startPrice;
@@ -80,6 +81,7 @@ contract Auction {
             Aucid: numAuc,
             creater: msg.sender,
             item: item,
+            itemname: Tics[item].name,
             timeBegin: timeBegin,
             timeEnd: timeEnd,
             startPrice: startPrice,
